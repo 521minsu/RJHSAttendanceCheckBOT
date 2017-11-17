@@ -1,0 +1,21 @@
+import discord
+import asyncio
+import globalvariables
+client = discord.Client()
+
+@client.event
+async def on_ready():
+	print("Logged in as:")
+	print(client.user.name)
+	print("ID:")
+	print(client.user.id)
+	print("Ready to use!")
+
+@client.event
+async def on_message(message):
+	if message.author == client.user:
+		return
+	elif message.content.startswith(globalvariables.prefix + "ping"):
+		await client.send_message(message.channel, "Pong!")
+
+client.run(""MzgwOTYyNzk1MzE3MTAwNTQ2.DPAQsg.Se1dEqTfU3DQX_sx4RYCiFcPqVA"")
