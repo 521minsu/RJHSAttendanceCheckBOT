@@ -1,48 +1,58 @@
-import random, pickle, os
+import random, pickle, os, util
 import discord, asyncio, globalvariables
 from discord.ext import commands
 
-client = discord.Client()
 des = "This is a discord bot that is specially made to use for attendance check in Rototuna High School"
+bot = commands.Bot(description=des, command_prefix=globalvariables.prefix)
 
-client = commands.Bot(description=des, command_prefix=globalvariables.prefix)
+ClassAtt = []
+PersonalAtt = ["N/A","N/A","N/A"]
 
-@client.event
+@bot.event
 async def on_ready():
 	print("Bot Online!")
-	print("Logged in as : {}".format(client.user.name))
-	print("ID: {}".format(client.user.id))
-	await client.change_presence(game=discord.Game(name="prefix: 'r!'"))
-	print("Ready to use")
+	print("Logged in as : {}".format(bot.user.name))
+	print("ID: {}".format(bot.user.id))
+	print("Database Version: {}".format(util.dbconcheck()))
+	await bot.change_presence(game=discord.Game(name="prefix: 'r!'"))
+	print("Ready to use!")
+
+# --------------------------------------------------------- #
 
 #Command 01 - Test Command (ping)
-@client.command(pass_context=True)
+@bot.command(pass_context=True)
 async def ping(ctx):
-	await client.say("Pong!")
+	print(ctx.message.author() + "has issued the command 'ping'")
+	await bot.say("Pong!")
 
 #Command 02 - Test Command (slap)
-@client.command(pass_context=True)
+@bot.command(pass_context=True)
 async def slap(ctx,args):
-	print(args)
-	await client.say("You slapped {}".format(args))
+	print(ctx.message.author() + "has issued the command 'slap.' The recipient was '{}'".format(args))
+	await bot.say("You slapped {}".format(args))
 
-#Command 03 - Test Command (add quote) - save to a file test
-@client.command(pass_context=True)
-async def addquote(ctx,args):
-	if not os.path.isfile("quote_file,pk1"):
-		quote_list = []
-	else:
-		with open("quote_file.pk1", "rb") as quote_file:
-			quote_list = pickle.load(quotefile)
-	quote_list.append(args)
-	with open("quote_file.pk1", "wb") as quote_file:
-		pickle.dump(quote_list,quote_file)
+#Command 03 - Test Command (embed)
+@bot.command(pass_context=True)
+async def embed(ctx):
+	em = discord.Embed(title='My Embed Title', description='My Embed Content.', colour=0xDEADBF)
+	em.set_author(name='Someone', icon_url=bot.user.default_avatar_url)
+	print(ctx.message.author() + "has issued the command 'embed'")
+	await bot.send_message(ctx.message.channel, embed=em)
 
-#Command 04 - Test Command (showquote) - show the quote saved
-@client.command(pass_context=False)
-async def showquote():
-	with open("quote_file.pk1", "rb") as quote_file:
-		quote_list = pickle.load(quote_file)
-	await client.say(random.choice(quote_list))
 
-client.run("MzgwOTYyNzk1MzE3MTAwNTQ2.DPAZ3A.zOhojblXlJjnlA2V_-7kikO7NFs")
+# ---------------------------------------------------------- #
+
+#Command 01 - Admin Command (Ban)
+#@bot.command(pass_content=True)
+#async def ban(ctx,args):
+
+
+# ---------------------------------------------------------- #
+
+try:
+	bot.run("MzgwOTYyNzk1MzE3MTAwNTQ2.DPAZ3A.zOhojblXlJjnlA2V_-7kikO7NFs")
+
+except KeyboardInterrupt:
+	util.dbdiscon()
+	bot.logout()
+	bot.close()
